@@ -1,0 +1,17 @@
+{{- range $name, $config := .Values }}
+{{- if and $config.enabled $config.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+spec:
+  type: {{ $config.service.type }}
+  selector:
+    app: {{ $name }}
+  ports:
+    - protocol: TCP
+      port: {{ $config.service.port }}
+      targetPort: {{ $config.service.port }}
+{{- end }}
+{{- end }}
+

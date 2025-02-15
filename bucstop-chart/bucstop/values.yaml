@@ -1,0 +1,88 @@
+ingress:
+  enabled: false
+service: 
+  type: ClusterIP
+
+gamemicrosnake:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: sirethan/gamemicrosnake
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 80
+  env:
+    ASPNETCORE_ENVIRONMENT: Development
+    ASPNETCORE_URLS: http://+:80
+
+gamemicropong:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: sirethan/gamemicropong
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 80
+  env:
+    ASPNETCORE_ENVIRONMENT: Development
+    ASPNETCORE_URLS: http://+:80
+
+gamemicrotetris:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: sirethan/gamemicrotetris
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 80
+  env:
+    ASPNETCORE_ENVIRONMENT: Development
+    ASPNETCORE_URLS: http://+:80
+
+frontend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: sirethan/bucstop
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 80
+  env:
+    ASPNETCORE_ENVIRONMENT: Development
+    ASPNETCORE_URLS: http://+:80
+  dependsOn:
+    - gateway
+
+gateway:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: tomphlpps/bucstop-gateway
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 80
+  env:
+    ASPNETCORE_ENVIRONMENT: Development
+    ASPNETCORE_URLS: http://+:80
+    SNAKE_SERVICE_URL: http://gamemicrosnake
+    TETRIS_SERVICE_URL: http://gamemicrotetris
+    PONG_SERVICE_URL: http://gamemicropong
+  dependsOn:
+    - gamemicrosnake
+    - gamemicropong
+    - gamemicrotetris
