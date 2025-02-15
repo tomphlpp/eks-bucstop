@@ -1,4 +1,55 @@
 ## Warning: Before this can be used collaboratively, you must configure terraform remote state storage. (Can be an s3 bucket)
+## 🛠️ Cluster Infrastructure
+
+This Terraform configuration creates and manages an **EKS cluster** using the **AWS Terraform modules**. The cluster includes:
+
+- **A fully managed Kubernetes control plane** via `aws_eks_cluster.this[0]`
+- **EKS Managed Node Groups** for worker nodes (`aws_eks_node_group.this[0]`)
+- **IAM roles and policies** for secure access control (`aws_iam_role.this[0]`, `aws_iam_role_policy_attachment.this[...]`)
+
+### 1️⃣ EKS Cluster Details
+- **Control Plane:** Amazon-managed Kubernetes API with auto-scaling and high availability.
+- **Worker Nodes:** Managed via **EKS Managed Node Groups** (`module.eks.module.eks_managed_node_group["initial"]`).
+- **IAM Authentication:** Uses `data.aws_eks_cluster_auth.cluster` for secure `kubectl` access.
+- **Encryption at Rest:** Enabled via **AWS KMS Keys** (`module.eks.module.kms.aws_kms_key.this[0]`).
+
+---
+
+## 🌐 Networking & VPC Architecture
+
+The EKS cluster is deployed within a **dedicated AWS VPC** managed via `module.vpc.aws_vpc.this[0]`, with:
+
+- **Multiple subnets for high availability:**
+  - **Public subnets** (`module.vpc.aws_subnet.public[...]`) for externally accessible workloads.
+  - **Private subnets** (`module.vpc.aws_subnet.private[...]`) for internal services and worker nodes.
+  - **Intra subnets** (`module.vpc.aws_subnet.intra[...]`) for internal communication without internet access.
+  
+- **Internet Gateway & NAT Gateway:**
+  - **Internet Gateway** (`module.vpc.aws_internet_gateway.this[0]`) enables public internet access.
+  - **NAT Gateway** (`module.vpc.aws_nat_gateway.this[0]`) allows private resources to access the internet.
+
+- **Route Tables & Associations:**
+  - `module.vpc.aws_route_table_association.private[...]` ensures nodes use private routing.
+  - `module.vpc.aws_route_table_association.public[...]` routes internet traffic through IGW.
+
+---
+
+## 🔐 Security & IAM
+
+- **EKS Cluster Security Group** (`module.eks.aws_security_group.cluster[0]`):  
+  - Restricts API access to authenticated IAM roles.
+  
+- **Worker Node Security Group** (`module.eks.aws_security_group.node[0]`):  
+  - Controls communication between pods and other AWS services.
+
+- **Security Group Rules:**
+  - `module.eks.aws_security_group_rule.node["ingress_cluster_443"]`: Controls secure API communication.
+  - `module.eks.aws_security_group_rule.node["ingress_nodes_ephemeral"]`: Manages ephemeral ports for pod networking.
+  - `module.eks.aws_security_group_rule.node["ingress_cluster_kubelet"]`: Ensures worker nodes can communicate with the API server.
+
+- **IAM Role-Based Access Control (RBAC):**
+  - `module.eks.aws_iam_role.this[0]`: IAM role for Kubernetes service accounts.
+  - `module.eks.aws_iam_openid_connect_provider.oidc_provider[0]`: Allows Kubernetes workloads to securely authenticate with AWS services via IRSA.
 
 # EKS Terraform Provisioning with Helm
 
