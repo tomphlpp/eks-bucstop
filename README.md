@@ -1,3 +1,5 @@
+## Warning: Before this can be used collaboratively, you must configure terraform remote state storage. (Can be an s3 bucket)
+
 # EKS Terraform Provisioning with Helm
 
 This repository provisions an Amazon EKS cluster using Terraform and deploys applications using Helm.
