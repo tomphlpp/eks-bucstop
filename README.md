@@ -1,4 +1,4 @@
-## Warning: Before this can be used collaboratively, you must configure terraform remote state storage. (Can be an s3 bucket)
+## Warning: Before this can be used collaboratively, you must configure terraform remote state storage. (Can be an s3 bucket... s3 module included for your convienence)
 ## 🛠️ Cluster Infrastructure
 
 This Terraform configuration creates and manages an **EKS cluster** using the **AWS Terraform modules**. The cluster includes:
