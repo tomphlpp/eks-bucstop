@@ -10,6 +10,15 @@ data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_name
 }
 
+resource "helm_release" "nginx" {
+  name      = "ingress-nginx"
+  namespace = "ingress-nginx"
+  chart     = "ingress-nginx/ingress-nginx" 
+
+  create_namespace = true
+
+}
+
 resource "helm_release" "bucstop" {
   name      = "bucstop"
   namespace = "default"
